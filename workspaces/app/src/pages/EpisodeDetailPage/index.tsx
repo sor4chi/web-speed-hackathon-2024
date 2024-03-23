@@ -1,11 +1,12 @@
-import { Suspense } from 'react';
+import { useState } from 'react';
 import { useParams } from 'react-router-dom';
+import { useMount } from 'react-use';
 import type { RouteParams } from 'regexparam';
 import invariant from 'tiny-invariant';
 
-import { useBook } from '../../features/book/hooks/useBook';
+import type { GetBookResponseWithEpisode } from '@wsh-2024/schema/src/api/books/GetBookResponseWithEpisode';
+
 import { EpisodeListItem } from '../../features/episode/components/EpisodeListItem';
-import { useEpisode } from '../../features/episode/hooks/useEpisode';
 import { Box } from '../../foundation/components/Box';
 import { Flex } from '../../foundation/components/Flex';
 import { Separator } from '../../foundation/components/Separator';
@@ -18,13 +19,20 @@ const EpisodeDetailPage: React.FC = () => {
   invariant(bookId);
   invariant(episodeId);
 
-  const { data: book } = useBook({ params: { bookId } });
-  const { data: episode } = useEpisode({ params: { episodeId } });
+  const [book, setBook] = useState<GetBookResponseWithEpisode>();
+
+  useMount(() => {
+    if (book == null) {
+      setBook((window as any).__BLOG_INJECTED_DATA__);
+    }
+  });
+
+  if (book == null) return null;
 
   return (
     <Box>
       <section aria-label="漫画ビューアー">
-        <ComicViewer episodeId={episode.id} />
+        <ComicViewer episodeId={episodeId} />
       </section>
 
       <Separator />
@@ -40,12 +48,4 @@ const EpisodeDetailPage: React.FC = () => {
   );
 };
 
-const EpisodeDetailPageWithSuspense: React.FC = () => {
-  return (
-    <Suspense fallback={null}>
-      <EpisodeDetailPage />
-    </Suspense>
-  );
-};
-
-export { EpisodeDetailPageWithSuspense as EpisodeDetailPage };
+export { EpisodeDetailPage };

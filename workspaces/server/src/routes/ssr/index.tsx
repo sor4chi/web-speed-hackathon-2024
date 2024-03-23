@@ -9,6 +9,7 @@ import { ServerStyleSheet } from 'styled-components';
 import { ClientApp } from '@wsh-2024/app/src/index';
 
 import { INDEX_HTML_PATH } from '../../constants/paths';
+import { bookRepository } from '../../repositories';
 
 const app = new Hono();
 
@@ -18,6 +19,10 @@ const SRCSETS = [
   { maxw: 640, minw: 320, path: '/assets/images/hero-640.webp' },
   { maxw: 320, minw: 0, path: '/assets/images/hero-320.webp' },
 ];
+
+const getImageUrl = (id: string) => `/images/${id}?format=webp&width=192&height=256`;
+
+const ssrInjecter = '<script id="inject-data" type="application/json"></script>';
 
 async function createHTML({ body, path, styleTags }: { body: string; path: string; styleTags: string }) {
   const htmlContent = await fs.readFile(INDEX_HTML_PATH, 'utf-8');
@@ -34,6 +39,23 @@ async function createHTML({ body, path, styleTags }: { body: string; path: strin
           `<link rel="preload" href="${path}" as="image" media="(min-width: ${minw}px) and (max-width: ${maxw}px)" />`,
       ).join('\n')}`,
     );
+  }
+  if (path.startsWith('/books/')) {
+    const splitted = path.split('/');
+    const bookId = splitted[2];
+    const res = await bookRepository.readWithEpisode({ params: { bookId: bookId || '' } });
+
+    if (!res.isErr()) {
+      const { image } = res.value;
+      content = content.replaceAll(
+        '<head>',
+        `<head>\n<link rel="preload" href="${getImageUrl(image.id)}" as="image" />`,
+      );
+      content = content.replaceAll(
+        ssrInjecter,
+        `<script>window['__BLOG_INJECTED_DATA__'] = ${JSON.stringify(res.value)}</script>`,
+      );
+    }
   }
 
   return content;

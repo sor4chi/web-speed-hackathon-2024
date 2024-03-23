@@ -9,6 +9,7 @@ import type { GetBookListRequestQuery } from '@wsh-2024/schema/src/api/books/Get
 import type { GetBookListResponse } from '@wsh-2024/schema/src/api/books/GetBookListResponse';
 import type { GetBookRequestParams } from '@wsh-2024/schema/src/api/books/GetBookRequestParams';
 import type { GetBookResponse } from '@wsh-2024/schema/src/api/books/GetBookResponse';
+import type { GetBookResponseWithEpisode } from '@wsh-2024/schema/src/api/books/GetBookResponseWithEpisode';
 import type { PatchBookRequestBody } from '@wsh-2024/schema/src/api/books/PatchBookRequestBody';
 import type { PatchBookRequestParams } from '@wsh-2024/schema/src/api/books/PatchBookRequestParams';
 import type { PatchBookResponse } from '@wsh-2024/schema/src/api/books/PatchBookResponse';
@@ -61,6 +62,66 @@ class BookRepository implements BookRepositoryInterface {
           episodes: {
             columns: {
               id: true,
+            },
+          },
+          image: {
+            columns: {
+              alt: true,
+              id: true,
+            },
+          },
+        },
+      });
+
+      if (data == null) {
+        throw new HTTPException(404, { message: `Book:${options.params.bookId} is not found` });
+      }
+      return ok(data);
+    } catch (cause) {
+      if (cause instanceof HTTPException) {
+        return err(cause);
+      }
+      return err(new HTTPException(500, { cause, message: `Failed to read book:${options.params.bookId}.` }));
+    }
+  }
+
+  async readWithEpisode(options: {
+    params: GetBookRequestParams;
+  }): Promise<Result<GetBookResponseWithEpisode, HTTPException>> {
+    try {
+      const data = await getDatabase().query.book.findFirst({
+        columns: {
+          description: true,
+          id: true,
+          name: true,
+          nameRuby: true,
+        },
+        where(book, { eq }) {
+          return eq(book.id, options.params.bookId);
+        },
+        with: {
+          author: {
+            columns: {
+              description: true,
+              id: true,
+              name: true,
+            },
+            with: {
+              image: {
+                columns: {
+                  alt: true,
+                  id: true,
+                },
+              },
+            },
+          },
+          episodes: {
+            columns: {
+              chapter: true,
+              description: true,
+              id: true,
+              imageId: true,
+              name: true,
             },
           },
           image: {

@@ -1,14 +1,15 @@
 import { useAtom } from 'jotai/react';
-import { Suspense, useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import { useParams } from 'react-router-dom';
+import { useMount } from 'react-use';
 import type { RouteParams } from 'regexparam';
 import { styled } from 'styled-components';
 import invariant from 'tiny-invariant';
 
+import type { GetBookResponseWithEpisode } from '@wsh-2024/schema/src/api/books/GetBookResponseWithEpisode';
+
 import { FavoriteBookAtomFamily } from '../../features/book/atoms/FavoriteBookAtomFamily';
-import { useBook } from '../../features/book/hooks/useBook';
-import { EpisodeListItem } from '../../features/episode/components/EpisodeListItem';
-import { useEpisodeList } from '../../features/episode/hooks/useEpisodeList';
+import { EpisodeListItemWithEpisodeData } from '../../features/episode/components/EpisodeListItem';
 import { Box } from '../../foundation/components/Box';
 import { Flex } from '../../foundation/components/Flex';
 import { Image } from '../../foundation/components/Image';
@@ -16,7 +17,6 @@ import { Link } from '../../foundation/components/Link';
 import { Separator } from '../../foundation/components/Separator';
 import { Spacer } from '../../foundation/components/Spacer';
 import { Text } from '../../foundation/components/Text';
-import { useImage } from '../../foundation/hooks/useImage';
 import { Color, Space, Typography } from '../../foundation/styles/variables';
 
 import { BottomNavigator } from './internal/BottomNavigator';
@@ -49,19 +49,25 @@ const BookDetailPage: React.FC = () => {
   const { bookId } = useParams<RouteParams<'/books/:bookId'>>();
   invariant(bookId);
 
-  const { data: book } = useBook({ params: { bookId } });
-  const { data: episodeList } = useEpisodeList({ query: { bookId } });
+  const [book, setBook] = useState<GetBookResponseWithEpisode>();
+
+  useMount(() => {
+    if (book == null) {
+      setBook((window as any).__BLOG_INJECTED_DATA__);
+    }
+  });
 
   const [isFavorite, toggleFavorite] = useAtom(FavoriteBookAtomFamily(bookId));
-
-  const bookImageUrl = useImage({ height: 256, imageId: book.image.id, width: 192 });
-  const auhtorImageUrl = useImage({ height: 32, imageId: book.author.image.id, width: 32 });
 
   const handleFavClick = useCallback(() => {
     toggleFavorite();
   }, [toggleFavorite]);
 
-  const latestEpisode = episodeList?.find((episode) => episode.chapter === 1);
+  if (book == null) return null;
+
+  const latestEpisode = book.episodes?.find((episode) => episode.chapter === 1);
+  const bookImageUrl = `/images/${book.image.id}?format=webp&width=192&height=256`;
+  const auhtorImageUrl = `/images/${book.author.image.id}?format=webp&width=32&height=32`;
 
   return (
     <Box height="100%" position="relative" px={Space * 2}>
@@ -106,10 +112,10 @@ const BookDetailPage: React.FC = () => {
 
       <section aria-label="エピソード一覧">
         <Flex align="center" as="ul" direction="column" justify="center">
-          {episodeList.map((episode) => (
-            <EpisodeListItem key={episode.id} bookId={bookId} episodeId={episode.id} />
+          {book.episodes.map((episode) => (
+            <EpisodeListItemWithEpisodeData key={episode.id} bookId={bookId} episode={episode} />
           ))}
-          {episodeList.length === 0 && (
+          {book.episodes.length === 0 && (
             <>
               <Spacer height={Space * 2} />
               <Text color={Color.MONO_100} typography={Typography.NORMAL14}>
@@ -123,12 +129,4 @@ const BookDetailPage: React.FC = () => {
   );
 };
 
-const BookDetailPageWithSuspense: React.FC = () => {
-  return (
-    <Suspense fallback={null}>
-      <BookDetailPage />
-    </Suspense>
-  );
-};
-
-export { BookDetailPageWithSuspense as BookDetailPage };
+export { BookDetailPage };

@@ -8,6 +8,15 @@ import { Color, Space, Typography } from '../../foundation/styles/variables';
 import { Input } from './internal/Input';
 import { SearchResult } from './internal/SearchResult';
 
+// debounced search
+let timer = 0;
+const debounce = (fn: () => void, delay: number) => {
+  clearTimeout(timer);
+  timer = window.setTimeout(() => {
+    fn();
+  }, delay);
+};
+
 const SearchPage: React.FC = () => {
   const { data: books } = useBookList({ query: {} });
 
@@ -18,7 +27,9 @@ const SearchPage: React.FC = () => {
 
   const onChangedInput = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
-      setKeyword(event.target.value);
+      debounce(() => {
+        setKeyword(event.target.value);
+      }, 500);
     },
     [setKeyword],
   );
@@ -34,7 +45,7 @@ const SearchPage: React.FC = () => {
         <Text color={Color.MONO_100} id={searchResultsA11yId} typography={Typography.NORMAL20} weight="bold">
           検索結果
         </Text>
-        {keyword !== '' && <SearchResult books={books} keyword={keyword} />}
+        <SearchResult books={books} keyword={keyword} />
       </Box>
     </Box>
   );

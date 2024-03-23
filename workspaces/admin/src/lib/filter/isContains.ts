@@ -5,6 +5,9 @@ type Params = {
 
 // ひらがな・カタカナ・半角・全角を区別せずに文字列が含まれているかを調べる
 export function isContains({ query, target }: Params): boolean {
+  // もし query が空文字列なら target に含まれていないとみなす
+  if (query === '') return false;
+
   // カタカナ・半角・全角をすべてひらがなに変換する
   const normalizedQuery = query.normalize('NFKC').replace(/[ァ-ンｧ-ﾝ]/g, (char) => {
     return String.fromCharCode(char.charCodeAt(0) - 0x60);

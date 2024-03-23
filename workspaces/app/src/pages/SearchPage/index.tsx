@@ -1,4 +1,4 @@
-import { Suspense, useCallback, useEffect, useId, useState } from 'react';
+import { useCallback, useEffect, useId, useState } from 'react';
 
 import { useBookList } from '../../features/book/hooks/useBookList';
 import { Box } from '../../foundation/components/Box';
@@ -45,18 +45,10 @@ const SearchPage: React.FC = () => {
         <Text color={Color.MONO_100} id={searchResultsA11yId} typography={Typography.NORMAL20} weight="bold">
           検索結果
         </Text>
-        <SearchResult books={books} keyword={keyword} />
+        <SearchResult books={books || []} keyword={keyword} />
       </Box>
     </Box>
   );
 };
 
-const SearchPageWithSuspense: React.FC = () => {
-  return (
-    <Suspense fallback={null}>
-      <SearchPage />
-    </Suspense>
-  );
-};
-
-export { SearchPageWithSuspense as SearchPage };
+export { SearchPage };

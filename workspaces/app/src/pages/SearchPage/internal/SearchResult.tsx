@@ -1,6 +1,6 @@
 import { Suspense, useMemo } from 'react';
 
-import type { GetBookListResponse } from '@wsh-2024/schema/src/api/books/GetBookListResponse';
+import type { GetBookListResponseForSearch } from '@wsh-2024/schema/src/api/books/GetBookListResponseForSearch';
 
 import { BookListItem } from '../../../features/book/components/BookListItem';
 import { Flex } from '../../../foundation/components/Flex';
@@ -9,7 +9,7 @@ import { Color, Typography } from '../../../foundation/styles/variables';
 import { isContains } from '../../../lib/filter/isContains';
 
 type Props = {
-  books: GetBookListResponse;
+  books: GetBookListResponseForSearch;
   keyword: string;
 };
 
@@ -30,7 +30,7 @@ export const SearchResult: React.FC<Props> = ({ books, keyword }) => {
         }
       >
         {relatedBooks.map((book) => (
-          <BookListItem key={book.id} bookId={book.id} />
+          <BookListItem key={book.id} book={book} />
         ))}
         {relatedBooks.length === 0 && (
           <Text color={Color.MONO_100} typography={Typography.NORMAL14}>

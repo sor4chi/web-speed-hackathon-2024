@@ -7,6 +7,7 @@ import type { DeleteBookRequestParams } from '@wsh-2024/schema/src/api/books/Del
 import type { DeleteBookResponse } from '@wsh-2024/schema/src/api/books/DeleteBookResponse';
 import type { GetBookListRequestQuery } from '@wsh-2024/schema/src/api/books/GetBookListRequestQuery';
 import type { GetBookListResponse } from '@wsh-2024/schema/src/api/books/GetBookListResponse';
+import type { GetBookListResponseForSearch } from '@wsh-2024/schema/src/api/books/GetBookListResponseForSearch';
 import type { GetBookRequestParams } from '@wsh-2024/schema/src/api/books/GetBookRequestParams';
 import type { GetBookResponse } from '@wsh-2024/schema/src/api/books/GetBookResponse';
 import type { GetBookResponseWithEpisode } from '@wsh-2024/schema/src/api/books/GetBookResponseWithEpisode';
@@ -192,6 +193,53 @@ class BookRepository implements BookRepositoryInterface {
               id: true,
             },
           },
+          image: {
+            columns: {
+              alt: true,
+              id: true,
+            },
+          },
+        },
+      });
+
+      return ok(data);
+    } catch (cause) {
+      if (cause instanceof HTTPException) {
+        return err(cause);
+      }
+      return err(new HTTPException(500, { cause, message: `Failed to read book list.` }));
+    }
+  }
+
+  async readAllForSearch(options: {
+    query: GetBookListRequestQuery;
+  }): Promise<Result<GetBookListResponseForSearch, HTTPException>> {
+    try {
+      const data = await getDatabase().query.book.findMany({
+        columns: {
+          description: true,
+          id: true,
+          name: true,
+          nameRuby: true,
+        },
+        limit: options.query.limit,
+        offset: options.query.offset,
+        orderBy(book, { asc }) {
+          return asc(book.createdAt);
+        },
+        where(book, { eq, like }) {
+          if (options.query.authorId != null) {
+            return eq(book.authorId, options.query.authorId);
+          }
+          if (options.query.authorName != null) {
+            return like(author.name, `%${options.query.authorName}%`);
+          }
+          if (options.query.name != null) {
+            return like(book.name, `%${options.query.name}%`);
+          }
+          return;
+        },
+        with: {
           image: {
             columns: {
               alt: true,

@@ -1,7 +1,7 @@
 import { inject } from 'regexparam';
 
 import type { GetBookListRequestQuery } from '@wsh-2024/schema/src/api/books/GetBookListRequestQuery';
-import type { GetBookListResponse } from '@wsh-2024/schema/src/api/books/GetBookListResponse';
+import type { GetBookListResponseForSearch } from '@wsh-2024/schema/src/api/books/GetBookListResponseForSearch';
 import type { GetBookRequestParams } from '@wsh-2024/schema/src/api/books/GetBookRequestParams';
 import type { GetBookResponse } from '@wsh-2024/schema/src/api/books/GetBookResponse';
 
@@ -10,7 +10,7 @@ import { apiClient } from '../../../lib/api/apiClient';
 
 type BookApiClient = DomainSpecificApiClientInterface<{
   fetch: [{ params: GetBookRequestParams }, GetBookResponse];
-  fetchList: [{ query: GetBookListRequestQuery }, GetBookListResponse];
+  fetchList: [{ query: GetBookListRequestQuery }, GetBookListResponseForSearch];
 }>;
 
 export const bookApiClient: BookApiClient = {
@@ -23,13 +23,13 @@ export const bookApiClient: BookApiClient = {
     ...options,
   }),
   fetchList: async ({ query }) => {
-    const response = await apiClient.get<GetBookListResponse>(inject('/api/v1/books', {}), {
+    const response = await apiClient.get<GetBookListResponseForSearch>(inject('/api/v1/books', {}), {
       params: query,
     });
     return response.data;
   },
   fetchList$$key: (options) => ({
-    requestUrl: `/api/v1/books`,
+    requestUrl: `/api/v1/books-for-search`,
     ...options,
   }),
 };

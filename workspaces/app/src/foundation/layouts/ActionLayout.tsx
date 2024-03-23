@@ -19,7 +19,8 @@ type Props = {
 
 export const ActionLayout: React.FC<Props> = ({ leftContent, rightContent }) => {
   return (
-    <Container>
+    <Container minHeight="calc(100vh + 90px)">
+      {/* Footerの高さ分を足した高さにする */}
       <_Header>
         <Flex align="center" justify="space-between">
           {leftContent}

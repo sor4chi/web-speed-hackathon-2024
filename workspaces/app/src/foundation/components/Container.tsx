@@ -3,8 +3,9 @@ import styled from 'styled-components';
 
 import { BreakPoint, Color } from '../styles/variables';
 
-const _Container = styled.div`
-  min-height: 100vh;
+// const _Container = styled.div`
+const _Container = ({ minHeight }: { minHeight?: string }) => styled.div`
+  min-height: ${minHeight ?? '100vh'};
   width: 100%;
   margin: 0 auto;
   max-width: ${BreakPoint.MOBILE}px;
@@ -18,8 +19,10 @@ const _Container = styled.div`
 
 type Props = {
   children: React.ReactNode;
+  minHeight?: string;
 };
 
-export const Container: React.FC<Props> = ({ children }) => {
-  return <_Container>{children}</_Container>;
+export const Container: React.FC<Props> = ({ children, minHeight }) => {
+  const __Container = _Container({ minHeight });
+  return <__Container>{children}</__Container>;
 };

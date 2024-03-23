@@ -21,5 +21,5 @@ type Props = {
 } & JSX.IntrinsicElements['img'];
 
 export const Image: React.FC<Props> = ({ height, loading = 'lazy', objectFit, width, ...rest }) => {
-  return <_Image {...rest} $height={height} $objectFit={objectFit} $width={width} loading={loading} />;
+  return <_Image {...rest} $height={height} $objectFit={objectFit} $width={width} decoding="async" loading={loading} />;
 };

@@ -1,6 +1,9 @@
 import { Hono } from 'hono';
+import { compress } from 'hono/compress';
 import { cors } from 'hono/cors';
+import { etag } from 'hono/etag';
 import { HTTPException } from 'hono/http-exception';
+import { logger } from 'hono/logger';
 import { secureHeaders } from 'hono/secure-headers';
 
 import { cacheControlMiddleware } from '../middlewares/cacheControlMiddleware';
@@ -27,11 +30,14 @@ app.use(
 );
 app.use(compressMiddleware);
 app.use(cacheControlMiddleware);
+app.use(etag());
+app.use(logger());
+app.route('/footer', footerApp); // compressを適用しない
+app.use(compress());
 
 app.get('/healthz', (c) => {
   return c.body('live', 200);
 });
-app.route('/footer', footerApp);
 app.route('/', staticApp);
 app.route('/', imageApp);
 app.route('/', apiApp);

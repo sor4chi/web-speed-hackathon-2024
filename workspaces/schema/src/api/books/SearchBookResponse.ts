@@ -3,7 +3,7 @@ import type { z } from 'zod';
 
 import { book, image } from '../../models';
 
-export const GetBookListResponseForSearchSchema = createSelectSchema(book)
+export const SearchBookResponseSchema = createSelectSchema(book)
   .pick({
     description: true,
     id: true,
@@ -18,4 +18,4 @@ export const GetBookListResponseForSearchSchema = createSelectSchema(book)
   })
   .array();
 
-export type GetBookListResponseForSearch = z.infer<typeof GetBookListResponseForSearchSchema>;
+export type SearchBookResponse = z.infer<typeof SearchBookResponseSchema>;

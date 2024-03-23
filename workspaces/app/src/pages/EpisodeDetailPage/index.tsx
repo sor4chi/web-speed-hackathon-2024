@@ -21,9 +21,13 @@ const EpisodeDetailPage: React.FC = () => {
 
   const [book, setBook] = useState<GetBookResponseWithEpisode>();
 
-  useMount(() => {
+  useMount(async () => {
     if (book == null) {
       setBook((window as any).__BLOG_INJECTED_DATA__);
+    } else {
+      const res = await fetch(`/api/v1/books-with-episode/${bookId}`);
+      const json = await res.json();
+      setBook(json);
     }
   });
 

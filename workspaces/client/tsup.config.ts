@@ -11,7 +11,7 @@ export default defineConfig(async (): Promise<Options[]> => {
   const PACKAGE_DIR = (await findPackageDir(process.cwd()))!;
   const WORKSPACE_DIR = (await findWorkspaceDir(process.cwd()))!;
 
-  const OUTPUT_DIR = path.resolve(PACKAGE_DIR, './dist');
+  const OUTPUT_DIR = path.resolve(PACKAGE_DIR, './dist-tsup');
 
   const SEED_IMAGE_DIR = path.resolve(WORKSPACE_DIR, './workspaces/server/seeds/images');
   const IMAGE_PATH_LIST = fs.readdirSync(SEED_IMAGE_DIR).map((file) => `/images/${file}`);
@@ -21,7 +21,6 @@ export default defineConfig(async (): Promise<Options[]> => {
       bundle: true,
       clean: true,
       entry: {
-        client: path.resolve(PACKAGE_DIR, './src/index.tsx'),
         serviceworker: path.resolve(PACKAGE_DIR, './src/serviceworker/index.ts'),
       },
       env: {

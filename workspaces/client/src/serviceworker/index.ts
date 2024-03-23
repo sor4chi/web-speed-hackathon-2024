@@ -18,7 +18,11 @@ self.addEventListener('activate', (ev: ExtendableEvent) => {
 });
 
 self.addEventListener('fetch', (ev: FetchEvent) => {
-  ev.respondWith(
+  if (ev.request.url.includes('/footer')) {
+    return;
+  }
+
+  return ev.respondWith(
     queue.add(() => onFetch(ev.request), {
       throwOnTimeout: true,
     }),

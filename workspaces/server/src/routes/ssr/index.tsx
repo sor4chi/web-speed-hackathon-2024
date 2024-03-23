@@ -12,12 +12,29 @@ import { INDEX_HTML_PATH } from '../../constants/paths';
 
 const app = new Hono();
 
-async function createHTML({ body, styleTags }: { body: string; styleTags: string }): Promise<string> {
+const SRCSETS = [
+  { maxw: 9999, minw: 768, path: '/assets/images/hero-1024.webp' },
+  { maxw: 768, minw: 640, path: '/assets/images/hero-768.webp' },
+  { maxw: 640, minw: 320, path: '/assets/images/hero-640.webp' },
+  { maxw: 320, minw: 0, path: '/assets/images/hero-320.webp' },
+];
+
+async function createHTML({ body, path, styleTags }: { body: string; path: string; styleTags: string }) {
   const htmlContent = await fs.readFile(INDEX_HTML_PATH, 'utf-8');
 
-  const content = htmlContent
+  let content = htmlContent
     .replaceAll('<div id="root"></div>', `<div id="root">${body}</div>`)
     .replaceAll('<style id="tag"></style>', styleTags);
+  // preload hero image
+  if (path === '/') {
+    content = content.replaceAll(
+      '<head>',
+      `<head>\n${SRCSETS.map(
+        ({ maxw, minw, path }) =>
+          `<link rel="preload" href="${path}" as="image" media="(min-width: ${minw}px) and (max-width: ${maxw}px)" />`,
+      ).join('\n')}`,
+    );
+  }
 
   return content;
 }
@@ -35,7 +52,7 @@ app.get('*', async (c) => {
     );
 
     const styleTags = sheet.getStyleTags();
-    const html = await createHTML({ body, styleTags });
+    const html = await createHTML({ body, path: c.req.path, styleTags });
 
     return c.html(html);
   } catch (cause) {

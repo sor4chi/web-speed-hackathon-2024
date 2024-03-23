@@ -1,13 +1,12 @@
 /// <reference types="@types/serviceworker" />
 import PQueue from 'p-queue';
 
-import { jitter } from './jitter';
 import { transformJpegXLToBmp } from './transformJpegXLToBmp';
 import { zstdFetch as fetch } from './zstdFetch';
 
 // ServiceWorker が負荷で落ちないように並列リクエスト数を制限する
 const queue = new PQueue({
-  concurrency: 5,
+  concurrency: 30,
 });
 
 self.addEventListener('install', (ev: ExtendableEvent) => {
@@ -28,7 +27,6 @@ self.addEventListener('fetch', (ev: FetchEvent) => {
 
 async function onFetch(request: Request): Promise<Response> {
   // サーバーの負荷を分散するために Jitter 処理をいれる
-  await jitter();
 
   const res = await fetch(request);
 

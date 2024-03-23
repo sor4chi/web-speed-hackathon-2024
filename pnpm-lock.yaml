@@ -20,6 +20,9 @@ importers:
       eslint-plugin-react-hooks:
         specifier: 4.6.0
         version: 4.6.0(eslint@8.56.0)
+      eslint-plugin-redos:
+        specifier: 4.4.5
+        version: 4.4.5(eslint@8.56.0)
       fast-glob:
         specifier: 3.3.2
         version: 3.3.2
@@ -5594,6 +5597,16 @@ packages:
       string.prototype.matchall: 4.0.10
     dev: true
 
+  /eslint-plugin-redos@4.4.5(eslint@8.56.0):
+    resolution: {integrity: sha512-t2OxsTply2KTXjjJbfQPgQcwxzcoqhx8DtmM/0r17GLNTr35Aa5C/slXHg1r2fEk1LhzjfYXysjLCsD0ZLJjLg==}
+    engines: {node: '>=14'}
+    peerDependencies:
+      eslint: '>= 3'
+    dependencies:
+      eslint: 8.56.0
+      recheck: 4.4.5
+    dev: true
+
   /eslint-plugin-sort@2.11.0(eslint@8.57.0)(typescript@5.4.2):
     resolution: {integrity: sha512-Rvt4XZI42KfyBvjvtcoKFEWg6L/nAKfMBagxKwipNfQd6zetwyHgh284XC1rlRzxY7scn0yfKgqdMILQIyKdlA==}
     peerDependencies:
@@ -8335,6 +8348,46 @@ packages:
     engines: {node: '>=8.10.0'}
     dependencies:
       picomatch: 2.3.1
+    dev: true
+
+  /recheck-jar@4.4.5:
+    resolution: {integrity: sha512-a2kMzcfr+ntT0bObNLY22EUNV6Z6WeZ+DybRmPOUXVWzGcqhRcrK74tpgrYt3FdzTlSh85pqoryAPmrNkwLc0g==}
+    requiresBuild: true
+    dev: true
+    optional: true
+
+  /recheck-linux-x64@4.4.5:
+    resolution: {integrity: sha512-s8OVPCpiSGw+tLCxH3eei7Zp2AoL22kXqLmEtWXi0AnYNwfuTjZmeLn2aQjW8qhs8ZPSkxS7uRIRTeZqR5Fv/Q==}
+    cpu: [x64]
+    os: [linux]
+    requiresBuild: true
+    dev: true
+    optional: true
+
+  /recheck-macos-x64@4.4.5:
+    resolution: {integrity: sha512-Ouup9JwwoKCDclt3Na8+/W2pVbt8FRpzjkDuyM32qTR2TOid1NI+P1GA6/VQAKEOjvaxgGjxhcP/WqAjN+EULA==}
+    cpu: [x64]
+    os: [darwin]
+    requiresBuild: true
+    dev: true
+    optional: true
+
+  /recheck-windows-x64@4.4.5:
+    resolution: {integrity: sha512-mkpzLHu9G9Ztjx8HssJh9k/Xm1d1d/4OoT7etHqFk+k1NGzISCRXBD22DqYF9w8+J4QEzTAoDf8icFt0IGhOEQ==}
+    cpu: [x64]
+    os: [win32]
+    requiresBuild: true
+    dev: true
+    optional: true
+
+  /recheck@4.4.5:
+    resolution: {integrity: sha512-J80Ykhr+xxWtvWrfZfPpOR/iw2ijvb4WY8d9AVoN8oHsPP07JT1rCAalUSACMGxM1cvSocb6jppWFjVS6eTTrA==}
+    engines: {node: '>=14'}
+    optionalDependencies:
+      recheck-jar: 4.4.5
+      recheck-linux-x64: 4.4.5
+      recheck-macos-x64: 4.4.5
+      recheck-windows-x64: 4.4.5
     dev: true
 
   /reflect.getprototypeof@1.0.4:

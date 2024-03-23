@@ -1,5 +1,10 @@
 module.exports = {
-  extends: [require.resolve('@3846masa/configs/eslint'), 'plugin:react/recommended', 'plugin:react-hooks/recommended'],
+  extends: [
+    require.resolve('@3846masa/configs/eslint'),
+    'plugin:react/recommended',
+    'plugin:react-hooks/recommended',
+    'plugin:redos/recommended',
+  ],
   rules: {
     'import/order': [
       'error',

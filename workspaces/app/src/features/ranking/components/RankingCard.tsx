@@ -1,6 +1,8 @@
 import { Suspense } from 'react';
 import styled from 'styled-components';
 
+import type { GetRankingListResponse } from '@wsh-2024/schema/src/api/rankings/GetRankingListResponse';
+
 import { SvgIcon } from '../../../features/icons/components/SvgIcon';
 import { Box } from '../../../foundation/components/Box';
 import { Flex } from '../../../foundation/components/Flex';
@@ -11,7 +13,6 @@ import { Spacer } from '../../../foundation/components/Spacer';
 import { Text } from '../../../foundation/components/Text';
 import { useImage } from '../../../foundation/hooks/useImage';
 import { Color, Radius, Space, Typography } from '../../../foundation/styles/variables';
-import { useBook } from '../../book/hooks/useBook';
 
 const _Wrapper = styled.li`
   width: 100%;
@@ -38,11 +39,11 @@ const _AvatarWrapper = styled.div`
 `;
 
 type Props = {
-  bookId: string;
+  item: GetRankingListResponse[0];
 };
 
-const RankingCard: React.FC<Props> = ({ bookId }) => {
-  const { data: book } = useBook({ params: { bookId } });
+const RankingCard: React.FC<Props> = ({ item }) => {
+  const { book } = item;
 
   const imageUrl = useImage({ height: 96, imageId: book.image.id, width: 96 });
   const authorImageUrl = useImage({ height: 32, imageId: book.author.image.id, width: 32 });
@@ -52,11 +53,9 @@ const RankingCard: React.FC<Props> = ({ bookId }) => {
       <_Link href={`/books/${book.id}`}>
         <Spacer height={Space * 1.5} />
         <Flex align="flex-start" gap={Space * 2.5} justify="flex-start">
-          {imageUrl != null && (
-            <_ImgWrapper>
-              <Image alt={book.name} height={96} objectFit="cover" src={imageUrl} width={96} />
-            </_ImgWrapper>
-          )}
+          <_ImgWrapper>
+            <Image alt={book.name} height={96} objectFit="cover" src={imageUrl} width={96} />
+          </_ImgWrapper>
           <Box width="100%">
             <Flex align="flex-start" direction="column" gap={Space * 1} justify="flex-start">
               <Text color={Color.MONO_100} typography={Typography.NORMAL16} weight="bold">
@@ -70,17 +69,15 @@ const RankingCard: React.FC<Props> = ({ bookId }) => {
             <Spacer height={Space * 1} />
 
             <Flex align="center" gap={Space * 1} justify="flex-end">
-              {authorImageUrl != null && (
-                <_AvatarWrapper>
-                  <Image
-                    alt={`${book.author.name}のアイコン`}
-                    height={32}
-                    objectFit="cover"
-                    src={authorImageUrl}
-                    width={32}
-                  />
-                </_AvatarWrapper>
-              )}
+              <_AvatarWrapper>
+                <Image
+                  alt={`${book.author.name}のアイコン`}
+                  height={32}
+                  objectFit="cover"
+                  src={authorImageUrl}
+                  width={32}
+                />
+              </_AvatarWrapper>
               <Text color={Color.MONO_80} typography={Typography.NORMAL12}>
                 {book.author.name}
               </Text>

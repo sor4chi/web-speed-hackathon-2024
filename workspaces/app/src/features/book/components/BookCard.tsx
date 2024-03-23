@@ -1,13 +1,14 @@
 import { Suspense } from 'react';
 import { styled } from 'styled-components';
 
+import type { GetReleaseResponse } from '@wsh-2024/schema/src/api/releases/GetReleaseResponse';
+
 import { Flex } from '../../../foundation/components/Flex';
 import { Image } from '../../../foundation/components/Image';
 import { Link } from '../../../foundation/components/Link';
 import { Text } from '../../../foundation/components/Text';
 import { useImage } from '../../../foundation/hooks/useImage';
 import { Color, Radius, Space, Typography } from '../../../foundation/styles/variables';
-import { useBook } from '../hooks/useBook';
 
 const _Wrapper = styled(Link)`
   display: flex;
@@ -33,22 +34,18 @@ const _AvatarWrapper = styled.div`
 `;
 
 type Props = {
-  bookId: string;
+  item: GetReleaseResponse['books'][0];
 };
 
-const BookCard: React.FC<Props> = ({ bookId }) => {
-  const { data: book } = useBook({ params: { bookId } });
-
+const BookCard: React.FC<Props> = ({ item: book }) => {
   const imageUrl = useImage({ height: 128, imageId: book.image.id, width: 192 });
   const authorImageUrl = useImage({ height: 32, imageId: book.author.image.id, width: 32 });
 
   return (
-    <_Wrapper href={`/books/${bookId}`}>
-      {imageUrl != null && (
-        <_ImgWrapper>
-          <Image alt={book.image.alt} height={128} objectFit="cover" src={imageUrl} width={192} />
-        </_ImgWrapper>
-      )}
+    <_Wrapper href={`/books/${book.id}`}>
+      <_ImgWrapper>
+        <Image alt={book.image.alt} height={128} objectFit="cover" src={imageUrl} width={192} />
+      </_ImgWrapper>
 
       <Flex align="stretch" direction="column" flexGrow={1} gap={Space * 1} justify="space-between" p={Space * 2}>
         <Text color={Color.MONO_100} typography={Typography.NORMAL14} weight="bold">
@@ -56,11 +53,9 @@ const BookCard: React.FC<Props> = ({ bookId }) => {
         </Text>
 
         <Flex align="center" gap={Space * 1} justify="flex-end">
-          {authorImageUrl != null && (
-            <_AvatarWrapper>
-              <Image alt={book.author.name} height={32} objectFit="cover" src={authorImageUrl} width={32} />
-            </_AvatarWrapper>
-          )}
+          <_AvatarWrapper>
+            <Image alt={book.author.name} height={32} objectFit="cover" src={authorImageUrl} width={32} />
+          </_AvatarWrapper>
           <Text color={Color.MONO_100} typography={Typography.NORMAL12}>
             {book.author.name}
           </Text>

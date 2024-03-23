@@ -3,6 +3,8 @@ import { HTTPException } from 'hono/http-exception';
 import { err, ok } from 'neverthrow';
 import type { Result } from 'neverthrow';
 
+import type { AdvancedSearchBookRequestQuery } from '@wsh-2024/schema/src/api/books/AdvancedSearchBookRequestQuery';
+import type { AdvancedSearchBookResponse } from '@wsh-2024/schema/src/api/books/AdvancedSearchBookResponse';
 import type { DeleteBookRequestParams } from '@wsh-2024/schema/src/api/books/DeleteBookRequestParams';
 import type { DeleteBookResponse } from '@wsh-2024/schema/src/api/books/DeleteBookResponse';
 import type { GetBookListRequestQuery } from '@wsh-2024/schema/src/api/books/GetBookListRequestQuery';
@@ -268,12 +270,76 @@ class BookRepository implements BookRepositoryInterface {
         },
       });
 
+      const { keyword } = options.query;
+
       const filteredData = data.filter((book) => {
         return (
-          isContains({ query: options.query.keyword, target: book.name }) ||
-          isContains({ query: options.query.keyword, target: book.nameRuby })
+          isContains({ query: keyword, target: book.name }) || isContains({ query: keyword, target: book.nameRuby })
         );
       });
+
+      return ok(filteredData);
+    } catch (cause) {
+      if (cause instanceof HTTPException) {
+        return err(cause);
+      }
+      return err(new HTTPException(500, { cause, message: `Failed to read book list.` }));
+    }
+  }
+
+  async readAllForAdvancedSearch(options: {
+    query: AdvancedSearchBookRequestQuery;
+  }): Promise<Result<AdvancedSearchBookResponse, HTTPException>> {
+    const { authorId, authorName, bookId, bookName } = options.query;
+    try {
+      const data = await getDatabase().query.book.findMany({
+        columns: {
+          description: true,
+          id: true,
+          name: true,
+          nameRuby: true,
+        },
+        orderBy(book, { asc }) {
+          return asc(book.createdAt);
+        },
+        where(book, { eq }) {
+          if (authorId) {
+            return eq(book.authorId, authorId);
+          }
+          if (bookId) {
+            return eq(book.id, bookId);
+          }
+          return;
+        },
+        with: {
+          author: {
+            columns: {
+              id: true,
+              name: true,
+            },
+          },
+          image: {
+            columns: {
+              alt: true,
+              id: true,
+            },
+          },
+        },
+      });
+
+      let filteredData = data;
+      if (bookName) {
+        filteredData = filteredData.filter((book) => {
+          return (
+            isContains({ query: bookName, target: book.name }) || isContains({ query: bookName, target: book.nameRuby })
+          );
+        });
+      }
+      if (authorName) {
+        filteredData = filteredData.filter((book) => {
+          return isContains({ query: authorName, target: book.author.name });
+        });
+      }
 
       return ok(filteredData);
     } catch (cause) {

@@ -6,7 +6,7 @@ import invariant from 'tiny-invariant';
 
 import type { GetBookResponseWithEpisode } from '@wsh-2024/schema/src/api/books/GetBookResponseWithEpisode';
 
-import { EpisodeListItem } from '../../features/episode/components/EpisodeListItem';
+import { EpisodeListItemWithEpisodeData } from '../../features/episode/components/EpisodeListItem';
 import { Box } from '../../foundation/components/Box';
 import { Flex } from '../../foundation/components/Flex';
 import { Separator } from '../../foundation/components/Separator';
@@ -40,7 +40,7 @@ const EpisodeDetailPage: React.FC = () => {
       <Box aria-label="エピソード一覧" as="section" px={Space * 2}>
         <Flex align="center" as="ul" direction="column" justify="center">
           {book.episodes.map((episode) => (
-            <EpisodeListItem key={episode.id} bookId={bookId} episodeId={episode.id} />
+            <EpisodeListItemWithEpisodeData key={episode.id} bookId={bookId} episode={episode} />
           ))}
         </Flex>
       </Box>

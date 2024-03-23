@@ -18,7 +18,7 @@ self.addEventListener('activate', (ev: ExtendableEvent) => {
 });
 
 self.addEventListener('fetch', (ev: FetchEvent) => {
-  if (ev.request.url.includes('/footer') || ev.request.url.includes('books-with-episode')) {
+  if (!ev.request.url.includes('/images/')) {
     return;
   }
 

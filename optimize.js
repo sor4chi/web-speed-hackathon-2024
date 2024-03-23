@@ -15,4 +15,22 @@ await Promise.all(
         .toFile(path.replace('.png', `-${width}.webp`));
     });
   }),
+  (await glob('./workspaces/server/seeds/images/*.{jpg,png}')).map(async (path) => {
+    [
+      [192, 256],
+      [96, 96],
+      [32, 32],
+      [192, 128],
+      [128, 128],
+    ].forEach(async ([width, height]) => {
+      await sharp(path)
+        .resize({
+          fit: 'cover',
+          height,
+          width,
+        })
+        .webp({ quality: 75 })
+        .toFile(path.replace(/\.[^.]+$/, `-${width}x${height}.webp`));
+    });
+  }),
 );

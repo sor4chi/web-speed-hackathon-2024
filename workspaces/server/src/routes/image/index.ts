@@ -63,6 +63,18 @@ const IMAGE_CONVERTER: Record<SupportedImageExtension, ConverterInterface> = {
 
 const app = new Hono();
 
+const generateImageKey = ({
+  format,
+  height,
+  imageId,
+  width,
+}: {
+  format: string;
+  height: number;
+  imageId: string;
+  width: number;
+}) => `${imageId}-${width}x${height}.${format}`;
+
 app.get(
   '/images/:imageFile',
   zValidator(
@@ -86,8 +98,25 @@ app.get(
 
     const resImgFormat = c.req.valid('query').format ?? reqImgExt.slice(1);
 
+    const key = generateImageKey({
+      format: resImgFormat,
+      height: c.req.valid('query').height ?? 0,
+      imageId: reqImgId,
+      width: c.req.valid('query').width ?? 0,
+    });
+
     if (!isSupportedImageFormat(resImgFormat)) {
       throw new HTTPException(501, { message: `Image format: ${resImgFormat} is not supported.` });
+    }
+
+    const isCached = await fs
+      .access(path.resolve(IMAGES_PATH, key))
+      .then(() => true)
+      .catch(() => false);
+
+    if (isCached) {
+      c.header('Content-Type', IMAGE_MIME_TYPE[resImgFormat]);
+      return c.body(createStreamBody(createReadStream(path.resolve(IMAGES_PATH, key))));
     }
 
     const origFileGlob = [path.resolve(IMAGES_PATH, `${reqImgId}`), path.resolve(IMAGES_PATH, `${reqImgId}.*`)];
@@ -124,6 +153,8 @@ app.get(
       height: manipulated.height,
       width: manipulated.width,
     });
+
+    await fs.writeFile(path.resolve(IMAGES_PATH, `${key}`), resBinary);
 
     c.header('Content-Type', IMAGE_MIME_TYPE[resImgFormat]);
     return c.body(resBinary);

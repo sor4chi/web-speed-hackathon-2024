@@ -1,3 +1,5 @@
+/* eslint-disable no-irregular-whitespace */
+export const OVERVIEW = `
 こころ
 夏目漱石
 
@@ -1593,3 +1595,5 @@
 2010年10月31日修正
 青空文庫作成ファイル：
 このファイルは、インターネットの図書館、青空文庫（http://www.aozora.gr.jp/）で作られました。入力、校正、制作にあたったのは、ボランティアの皆さんです。
+
+`;

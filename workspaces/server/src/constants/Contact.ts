@@ -1,3 +1,5 @@
+/* eslint-disable no-irregular-whitespace */
+export const CONTACT = `
 パソコン創世記
 富田倫生
 
@@ -6139,3 +6141,4 @@
 2013年8月16日修正
 
 この作品は、クリエイティブ・コモンズ「表示 2.1 日本」でライセンスされています。利用条件は、http://creativecommons.org/licenses/by/2.1/jp/を参照してください。
+`;

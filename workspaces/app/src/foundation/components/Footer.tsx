@@ -26,14 +26,17 @@ const fetchTextFromServer = async (url: string) => {
 };
 
 interface ModalProps {
-  text: string;
   title: string;
+  url: string;
 }
 
-const EDGE_ORIGIN = 'https://web-speed-hackathon-2024.pages.dev';
-
-const Modal: React.FC<ModalProps> = ({ text, title }) => {
+const Modal: React.FC<ModalProps> = ({ title, url }) => {
   const modalId = useId();
+  const [TEXT, setTEXT] = React.useState('Loading...');
+
+  React.useEffect(() => {
+    fetchTextFromServer(url).then(setTEXT);
+  }, []);
 
   return (
     <_Content aria-labelledby={modalId} role="dialog">
@@ -42,7 +45,7 @@ const Modal: React.FC<ModalProps> = ({ text, title }) => {
       </Text>
       <Spacer height={Space * 1} />
       <Text as="p" color={Color.MONO_100} typography={Typography.NORMAL12}>
-        {text}
+        {TEXT}
       </Text>
     </_Content>
   );
@@ -58,28 +61,23 @@ export const Footer: React.FC = () => {
   const updateDialogContent = useSetAtom(DialogContentAtom);
 
   const handleRequestToTermDialogOpen = async () => {
-    const text = await fetchTextFromServer(`${EDGE_ORIGIN}/term.txt`);
-    updateDialogContent(<Modal text={text} title="利用規約" />);
+    updateDialogContent(<Modal title="利用規約" url="/footer/term" />);
   };
 
   const handleRequestToContactDialogOpen = async () => {
-    const text = await fetchTextFromServer(`${EDGE_ORIGIN}/contact.txt`);
-    updateDialogContent(<Modal text={text} title="お問い合わせ" />);
+    updateDialogContent(<Modal title="お問い合わせ" url="/footer/contact" />);
   };
 
   const handleRequestToQuestionDialogOpen = async () => {
-    const text = await fetchTextFromServer(`${EDGE_ORIGIN}/question.txt`);
-    updateDialogContent(<Modal text={text} title="Q&A" />);
+    updateDialogContent(<Modal title="Q&A" url="/footer/question" />);
   };
 
   const handleRequestToCompanyDialogOpen = async () => {
-    const text = await fetchTextFromServer(`${EDGE_ORIGIN}/company.txt`);
-    updateDialogContent(<Modal text={text} title="運営会社" />);
+    updateDialogContent(<Modal title="運営会社" url="/footer/company" />);
   };
 
   const handleRequestToOverviewDialogOpen = async () => {
-    const text = await fetchTextFromServer(`${EDGE_ORIGIN}/overview.txt`);
-    updateDialogContent(<Modal text={text} title="Cyber TOONとは" />);
+    updateDialogContent(<Modal title="Cyber TOONとは" url="/footer/overview" />);
   };
 
   return (

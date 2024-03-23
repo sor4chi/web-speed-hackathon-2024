@@ -1,3 +1,5 @@
+/* eslint-disable no-irregular-whitespace */
+export const TERM = `
 罪と罰
 フョードル・ミハイロヴィッチ・ドストエフスキー
 米川正夫訳
@@ -4191,3 +4193,5 @@ Du hast Diamanten und Perlen ……
 2021年10月27日作成
 青空文庫作成ファイル：
 このファイルは、インターネットの図書館、青空文庫（https://www.aozora.gr.jp/）で作られました。入力、校正、制作にあたったのは、ボランティアの皆さんです。
+
+`;

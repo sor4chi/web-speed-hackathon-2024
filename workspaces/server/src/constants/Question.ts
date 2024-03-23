@@ -1,3 +1,5 @@
+/* eslint-disable no-irregular-whitespace */
+export const QUESTION = `
 ドグラ・マグラ
 夢野久作
 
@@ -3414,3 +3416,4 @@
 2011年5月20日修正
 青空文庫作成ファイル：
 このファイルは、インターネットの図書館、青空文庫（http://www.aozora.gr.jp/）で作られました．入力、校正、制作にあたったのは、ボランティアの皆さんです。
+`;

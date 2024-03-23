@@ -21,8 +21,9 @@ import { useFormik } from 'formik';
 import { useId, useMemo, useState } from 'react';
 import { create } from 'zustand';
 
-import { useBookList } from '../../features/books/hooks/useBookList';
-import { isContains } from '../../lib/filter/isContains';
+import type { AdvancedSearchBookRequestQuery } from '@wsh-2024/schema/src/api/books/AdvancedSearchBookRequestQuery';
+
+import { useBookAdvancedSearch } from '../../features/books/hooks/useBookAdvancedSearch';
 
 import { BookDetailModal } from './internal/BookDetailModal';
 import { CreateBookModal } from './internal/CreateBookModal';
@@ -71,7 +72,6 @@ function debounce(callback: () => void, delay: number) {
 }
 
 export const BookListPage: React.FC = () => {
-  const { data: bookList = [] } = useBookList();
   const bookListA11yId = useId();
 
   const formik = useFormik({
@@ -82,37 +82,36 @@ export const BookListPage: React.FC = () => {
     onSubmit() {},
   });
 
-  const filteredBookList = useMemo(() => {
+  const [query, setQuery] = useState<AdvancedSearchBookRequestQuery>({});
+
+  useMemo(() => {
     if (formik.values.query === '') {
-      return bookList;
+      setQuery({});
+      return;
     }
 
     switch (formik.values.kind) {
       case BookSearchKind.BookId: {
-        return bookList.filter((book) => book.id === formik.values.query);
+        setQuery({ bookId: formik.values.query });
+        break;
       }
       case BookSearchKind.BookName: {
-        return bookList.filter((book) => {
-          return (
-            isContains({ query: formik.values.query, target: book.name }) ||
-            isContains({ query: formik.values.query, target: book.nameRuby })
-          );
-        });
+        setQuery({ bookName: formik.values.query });
+        break;
       }
       case BookSearchKind.AuthorId: {
-        return bookList.filter((book) => book.author.id === formik.values.query);
+        setQuery({ authorId: formik.values.query });
+        break;
       }
       case BookSearchKind.AuthorName: {
-        return bookList.filter((book) => {
-          return isContains({ query: formik.values.query, target: book.author.name });
-        });
+        setQuery({ authorName: formik.values.query });
+        break;
       }
       default: {
         formik.values.kind satisfies never;
-        return bookList;
       }
     }
-  }, [formik.values.kind, formik.values.query, bookList]);
+  }, [formik.values.kind, formik.values.query]);
 
   const [useModalStore] = useState(() => {
     return create<BookModalState & BookModalAction>()((set) => ({
@@ -223,27 +222,7 @@ export const BookListPage: React.FC = () => {
                 </Tr>
               </Thead>
               <Tbody>
-                {filteredBookList.map((book) => (
-                  <Tr key={book.id}>
-                    <Td textAlign="center" verticalAlign="middle">
-                      <Button colorScheme="teal" onClick={() => modalState.openDetail(book.id)} variant="solid">
-                        詳細
-                      </Button>
-                    </Td>
-                    <Td verticalAlign="middle">
-                      <Text fontWeight="bold">{book.name}</Text>
-                      <Text color="gray.400" fontSize="small">
-                        {book.id}
-                      </Text>
-                    </Td>
-                    <Td verticalAlign="middle">
-                      <Text fontWeight="bold">{book.author.name}</Text>
-                      <Text color="gray.400" fontSize="small">
-                        {book.author.id}
-                      </Text>
-                    </Td>
-                  </Tr>
-                ))}
+                <BookList onDetailClick={(bookId) => modalState.openDetail(bookId)} query={query} />
               </Tbody>
             </Table>
           </TableContainer>
@@ -254,6 +233,43 @@ export const BookListPage: React.FC = () => {
         <BookDetailModal isOpen bookId={modalState.params.bookId} onClose={() => modalState.close()} />
       ) : null}
       {modalState.mode === BookModalMode.Create ? <CreateBookModal isOpen onClose={() => modalState.close()} /> : null}
+    </>
+  );
+};
+
+interface BookListProps {
+  onDetailClick: (bookId: string) => void;
+  query: AdvancedSearchBookRequestQuery;
+}
+
+const BookList = ({ onDetailClick, query }: BookListProps) => {
+  const { data: books } = useBookAdvancedSearch(query);
+
+  if (!books) return null;
+
+  return (
+    <>
+      {books.map((book) => (
+        <Tr key={book.id}>
+          <Td textAlign="center" verticalAlign="middle">
+            <Button colorScheme="teal" onClick={() => onDetailClick(book.id)} variant="solid">
+              詳細
+            </Button>
+          </Td>
+          <Td verticalAlign="middle">
+            <Text fontWeight="bold">{book.name}</Text>
+            <Text color="gray.400" fontSize="small">
+              {book.id}
+            </Text>
+          </Td>
+          <Td verticalAlign="middle">
+            <Text fontWeight="bold">{book.author.name}</Text>
+            <Text color="gray.400" fontSize="small">
+              {book.author.id}
+            </Text>
+          </Td>
+        </Tr>
+      ))}
     </>
   );
 };

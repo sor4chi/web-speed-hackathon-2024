@@ -1,5 +1,7 @@
 import { inject } from 'regexparam';
 
+import type { AdvancedSearchBookRequestQuery } from '@wsh-2024/schema/src/api/books/AdvancedSearchBookRequestQuery';
+import type { AdvancedSearchBookResponse } from '@wsh-2024/schema/src/api/books/AdvancedSearchBookResponse';
 import type { DeleteBookRequestParams } from '@wsh-2024/schema/src/api/books/DeleteBookRequestParams';
 import type { DeleteBookResponse } from '@wsh-2024/schema/src/api/books/DeleteBookResponse';
 import type { GetBookListRequestQuery } from '@wsh-2024/schema/src/api/books/GetBookListRequestQuery';
@@ -16,6 +18,7 @@ import type { DomainSpecificApiClientInterface } from '../../../lib/api/DomainSp
 import { apiClient } from '../../../lib/api/apiClient';
 
 type BookApiClient = DomainSpecificApiClientInterface<{
+  advancedSearch: [{ query: AdvancedSearchBookRequestQuery }, AdvancedSearchBookResponse];
   delete: [{ params: DeleteBookRequestParams }, DeleteBookResponse];
   fetch: [{ params: GetBookRequestParams }, GetBookResponse];
   fetchList: [{ query: GetBookListRequestQuery }, GetBookListResponse];
@@ -24,6 +27,24 @@ type BookApiClient = DomainSpecificApiClientInterface<{
 }>;
 
 export const bookApiClient: BookApiClient = {
+  advancedSearch: async ({ query }) => {
+    const searchParams = new URLSearchParams();
+    if (query.authorId) searchParams.set('authorId', query.authorId);
+    if (query.authorName) searchParams.set('authorName', query.authorName);
+    if (query.bookId) searchParams.set('bookId', query.bookId);
+    if (query.bookName) searchParams.set('bookName', query.bookName);
+    const response = await apiClient
+      .get(inject('api/v1/books-for-advanced-search', {}), { searchParams })
+      .json<AdvancedSearchBookResponse>();
+    return response;
+  },
+  advancedSearch$$key: (options) => [
+    {
+      method: 'get',
+      requestUrl: '/api/v1/books-for-advanced-search',
+    },
+    options,
+  ],
   delete: async ({ params }) => {
     const response = await apiClient.delete(inject('api/v1/books/:bookId', params)).json<DeleteBookResponse>();
     return response;

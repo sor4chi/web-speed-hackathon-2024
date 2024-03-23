@@ -1,5 +1,6 @@
 import { OpenAPIHono } from '@hono/zod-openapi';
 
+import { advancedSearchBookApp } from './advancedSearchBook';
 import { deleteBookApp } from './deleteBook';
 import { getBookApp } from './getBook';
 import { getBookListApp } from './getBookList';
@@ -12,6 +13,7 @@ const app = new OpenAPIHono();
 
 app.route('/', getBookApp);
 app.route('/', searchBookApp);
+app.route('/', advancedSearchBookApp);
 app.route('/', getBookListApp);
 app.route('/', getBookWithEpisodeApp);
 app.route('/', postBookApp);

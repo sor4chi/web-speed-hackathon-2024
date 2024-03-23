@@ -8,6 +8,7 @@ import { compressMiddleware } from '../middlewares/compressMiddleware';
 
 import { adminApp } from './admin';
 import { apiApp } from './api';
+import { footerApp } from './footer';
 import { imageApp } from './image';
 import { ssrApp } from './ssr';
 import { staticApp } from './static';
@@ -30,6 +31,7 @@ app.use(cacheControlMiddleware);
 app.get('/healthz', (c) => {
   return c.body('live', 200);
 });
+app.route('/footer', footerApp);
 app.route('/', staticApp);
 app.route('/', imageApp);
 app.route('/', apiApp);

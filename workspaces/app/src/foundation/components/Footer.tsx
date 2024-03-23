@@ -3,11 +3,6 @@ import React, { useId } from 'react';
 import styled from 'styled-components';
 
 import { DialogContentAtom } from '../atoms/DialogContentAtom';
-import { COMPANY } from '../constants/Company';
-import { CONTACT } from '../constants/Contact';
-import { OVERVIEW } from '../constants/Overview';
-import { QUESTION } from '../constants/Question';
-import { TERM } from '../constants/Term';
 import { Color, Space, Typography } from '../styles/variables';
 
 import { Box } from './Box';
@@ -24,6 +19,38 @@ const _Content = styled.section`
   white-space: pre-line;
 `;
 
+const fetchTextFromServer = async (url: string) => {
+  const response = await fetch(url);
+  const text = await response.text();
+  return text;
+};
+
+interface ModalProps {
+  title: string;
+  url: string;
+}
+
+const Modal: React.FC<ModalProps> = ({ title, url }) => {
+  const modalId = useId();
+  const [TEXT, setTEXT] = React.useState('Loading...');
+
+  React.useEffect(() => {
+    fetchTextFromServer(url).then(setTEXT);
+  }, []);
+
+  return (
+    <_Content aria-labelledby={modalId} role="dialog">
+      <Text as="h2" color={Color.MONO_100} id={modalId} typography={Typography.NORMAL16}>
+        {title}
+      </Text>
+      <Spacer height={Space * 1} />
+      <Text as="p" color={Color.MONO_100} typography={Typography.NORMAL12}>
+        {TEXT}
+      </Text>
+    </_Content>
+  );
+};
+
 export const Footer: React.FC = () => {
   const [isClient, setIsClient] = React.useState(false);
 
@@ -31,82 +58,26 @@ export const Footer: React.FC = () => {
     setIsClient(true);
   }, []);
 
-  const termDialogA11yId = useId();
-  const contactDialogA11yId = useId();
-  const questionDialogA11yId = useId();
-  const companyDialogA11yId = useId();
-  const overviewDialogA11yId = useId();
-
   const updateDialogContent = useSetAtom(DialogContentAtom);
 
-  const handleRequestToTermDialogOpen = () => {
-    updateDialogContent(
-      <_Content aria-labelledby={termDialogA11yId} role="dialog">
-        <Text as="h2" color={Color.MONO_100} id={termDialogA11yId} typography={Typography.NORMAL16}>
-          利用規約
-        </Text>
-        <Spacer height={Space * 1} />
-        <Text as="p" color={Color.MONO_100} typography={Typography.NORMAL12}>
-          {TERM}
-        </Text>
-      </_Content>,
-    );
+  const handleRequestToTermDialogOpen = async () => {
+    updateDialogContent(<Modal title="利用規約" url="/footer/term" />);
   };
 
-  const handleRequestToContactDialogOpen = () => {
-    updateDialogContent(
-      <_Content aria-labelledby={contactDialogA11yId} role="dialog">
-        <Text as="h2" color={Color.MONO_100} id={contactDialogA11yId} typography={Typography.NORMAL16}>
-          お問い合わせ
-        </Text>
-        <Spacer height={Space * 1} />
-        <Text as="p" color={Color.MONO_100} typography={Typography.NORMAL12}>
-          {CONTACT}
-        </Text>
-      </_Content>,
-    );
+  const handleRequestToContactDialogOpen = async () => {
+    updateDialogContent(<Modal title="お問い合わせ" url="/footer/contact" />);
   };
 
-  const handleRequestToQuestionDialogOpen = () => {
-    updateDialogContent(
-      <_Content aria-labelledby={questionDialogA11yId} role="dialog">
-        <Text as="h2" color={Color.MONO_100} id={questionDialogA11yId} typography={Typography.NORMAL16}>
-          Q&A
-        </Text>
-        <Spacer height={Space * 1} />
-        <Text as="p" color={Color.MONO_100} typography={Typography.NORMAL12}>
-          {QUESTION}
-        </Text>
-      </_Content>,
-    );
+  const handleRequestToQuestionDialogOpen = async () => {
+    updateDialogContent(<Modal title="Q&A" url="/footer/question" />);
   };
 
-  const handleRequestToCompanyDialogOpen = () => {
-    updateDialogContent(
-      <_Content aria-labelledby={companyDialogA11yId} role="dialog">
-        <Text as="h2" color={Color.MONO_100} id={companyDialogA11yId} typography={Typography.NORMAL16}>
-          運営会社
-        </Text>
-        <Spacer height={Space * 1} />
-        <Text as="p" color={Color.MONO_100} typography={Typography.NORMAL12}>
-          {COMPANY}
-        </Text>
-      </_Content>,
-    );
+  const handleRequestToCompanyDialogOpen = async () => {
+    updateDialogContent(<Modal title="運営会社" url="/footer/company" />);
   };
 
-  const handleRequestToOverviewDialogOpen = () => {
-    updateDialogContent(
-      <_Content aria-labelledby={overviewDialogA11yId} role="dialog">
-        <Text as="h2" color={Color.MONO_100} id={overviewDialogA11yId} typography={Typography.NORMAL16}>
-          Cyber TOONとは
-        </Text>
-        <Spacer height={Space * 1} />
-        <Text as="p" color={Color.MONO_100} typography={Typography.NORMAL12}>
-          {OVERVIEW}
-        </Text>
-      </_Content>,
-    );
+  const handleRequestToOverviewDialogOpen = async () => {
+    updateDialogContent(<Modal title="Cyber TOONとは" url="/footer/overview" />);
   };
 
   return (

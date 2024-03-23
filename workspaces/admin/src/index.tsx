@@ -6,7 +6,7 @@ import { Suspense, useEffect } from 'react';
 import { queryClient } from './lib/api/queryClient';
 import { router } from './routes';
 
-export const AdminApp: React.FC = () => {
+const AdminApp: React.FC = () => {
   const toast = useToast();
 
   useEffect(() => {
@@ -38,3 +38,5 @@ export const AdminApp: React.FC = () => {
     </Suspense>
   );
 };
+
+export default AdminApp;

@@ -6,7 +6,7 @@ import ReactDOMServer from 'react-dom/server';
 import { StaticRouter } from 'react-router-dom/server';
 import { ServerStyleSheet } from 'styled-components';
 
-import { ClientApp } from '@wsh-2024/app/src/index';
+import ClientApp from '@wsh-2024/app/src/index';
 
 import { INDEX_HTML_PATH } from '../../constants/paths';
 import { bookRepository } from '../../repositories';

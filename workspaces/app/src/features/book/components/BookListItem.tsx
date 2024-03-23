@@ -1,7 +1,5 @@
 import styled from 'styled-components';
 
-import type { GetBookListResponseForSearch } from '@wsh-2024/schema/src/api/books/GetBookListResponseForSearch';
-
 import { Box } from '../../../foundation/components/Box';
 import { Flex } from '../../../foundation/components/Flex';
 import { Image } from '../../../foundation/components/Image';
@@ -29,7 +27,14 @@ const _ImgWrapper = styled.div`
 `;
 
 type Props = {
-  book: GetBookListResponseForSearch[0];
+  book: {
+    description: string;
+    id: string;
+    image: {
+      id: string;
+    };
+    name: string;
+  };
 };
 
 export const BookListItem: React.FC<Props> = ({ book }) => {

@@ -1,7 +1,7 @@
 import { createRoute, OpenAPIHono } from '@hono/zod-openapi';
 
-import { GetBookListRequestQuerySchema } from '@wsh-2024/schema/src/api/books/GetBookListRequestQuery';
-import { GetBookListResponseForSearchSchema } from '@wsh-2024/schema/src/api/books/GetBookListResponseForSearch';
+import { SearchBookRequestQuerySchema } from '@wsh-2024/schema/src/api/books/SearchBookRequestQuery';
+import { SearchBookResponseSchema } from '@wsh-2024/schema/src/api/books/SearchBookResponse';
 
 import { bookRepository } from '../../../repositories';
 
@@ -11,16 +11,16 @@ const route = createRoute({
   method: 'get',
   path: '/api/v1/books-for-search',
   request: {
-    query: GetBookListRequestQuerySchema,
+    query: SearchBookRequestQuerySchema,
   },
   responses: {
     200: {
       content: {
         'application/json': {
-          schema: GetBookListResponseForSearchSchema,
+          schema: SearchBookResponseSchema,
         },
       },
-      description: 'Get book list.',
+      description: 'Search books.',
     },
   },
   tags: ['[App] Books API'],
@@ -36,4 +36,4 @@ app.openapi(route, async (c) => {
   return c.json(res.value);
 });
 
-export { app as getBookListApp };
+export { app as searchBookApp };

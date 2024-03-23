@@ -7,7 +7,6 @@ import type { DeleteBookRequestParams } from '@wsh-2024/schema/src/api/books/Del
 import type { DeleteBookResponse } from '@wsh-2024/schema/src/api/books/DeleteBookResponse';
 import type { GetBookListRequestQuery } from '@wsh-2024/schema/src/api/books/GetBookListRequestQuery';
 import type { GetBookListResponse } from '@wsh-2024/schema/src/api/books/GetBookListResponse';
-import type { GetBookListResponseForSearch } from '@wsh-2024/schema/src/api/books/GetBookListResponseForSearch';
 import type { GetBookRequestParams } from '@wsh-2024/schema/src/api/books/GetBookRequestParams';
 import type { GetBookResponse } from '@wsh-2024/schema/src/api/books/GetBookResponse';
 import type { GetBookResponseWithEpisode } from '@wsh-2024/schema/src/api/books/GetBookResponseWithEpisode';
@@ -16,6 +15,8 @@ import type { PatchBookRequestParams } from '@wsh-2024/schema/src/api/books/Patc
 import type { PatchBookResponse } from '@wsh-2024/schema/src/api/books/PatchBookResponse';
 import type { PostBookRequestBody } from '@wsh-2024/schema/src/api/books/PostBookRequestBody';
 import type { PostBookResponse } from '@wsh-2024/schema/src/api/books/PostBookResponse';
+import type { SearchBookRequestQuery } from '@wsh-2024/schema/src/api/books/SearchBookRequestQuery';
+import type { SearchBookResponse } from '@wsh-2024/schema/src/api/books/SearchBookResponse';
 import { author, book, episode, episodePage, feature, ranking } from '@wsh-2024/schema/src/models';
 
 import { getDatabase } from '../database/drizzle';
@@ -30,6 +31,38 @@ type BookRepositoryInterface = {
     params: PatchBookRequestParams;
   }): Promise<Result<PatchBookResponse, HTTPException>>;
 };
+type Params = {
+  query: string;
+  target: string;
+};
+
+// ひらがな・カタカナ・半角・全角を区別せずに文字列が含まれているかを調べる
+export function isContains({ query, target }: Params): boolean {
+  // もし query が空文字列なら target に含まれていないとみなす
+  if (query === '') return false;
+
+  // カタカナ・半角・全角をすべてひらがなに変換する
+  const normalizedQuery = query.normalize('NFKC').replace(/[ァ-ンｧ-ﾝ]/g, (char) => {
+    return String.fromCharCode(char.charCodeAt(0) - 0x60);
+  });
+  const normalizedTarget = target.normalize('NFKC').replace(/[ァ-ンｧ-ﾝ]/g, (char) => {
+    return String.fromCharCode(char.charCodeAt(0) - 0x60);
+  });
+
+  // target の先頭から順に query が含まれているかを調べる
+  TARGET_LOOP: for (let offset = 0; offset <= normalizedTarget.length - normalizedQuery.length; offset++) {
+    for (let idx = 0; idx < normalizedQuery.length; idx++) {
+      if (normalizedTarget[offset + idx] !== normalizedQuery[idx]) {
+        continue TARGET_LOOP;
+      }
+    }
+    // query のすべての文字が含まれていたら true を返す
+    return true;
+  }
+
+  // target の最後まで query が含まれていなかったら false を返す
+  return false;
+}
 
 class BookRepository implements BookRepositoryInterface {
   async read(options: { params: GetBookRequestParams }): Promise<Result<GetBookResponse, HTTPException>> {
@@ -212,8 +245,8 @@ class BookRepository implements BookRepositoryInterface {
   }
 
   async readAllForSearch(options: {
-    query: GetBookListRequestQuery;
-  }): Promise<Result<GetBookListResponseForSearch, HTTPException>> {
+    query: SearchBookRequestQuery;
+  }): Promise<Result<SearchBookResponse, HTTPException>> {
     try {
       const data = await getDatabase().query.book.findMany({
         columns: {
@@ -222,22 +255,8 @@ class BookRepository implements BookRepositoryInterface {
           name: true,
           nameRuby: true,
         },
-        limit: options.query.limit,
-        offset: options.query.offset,
         orderBy(book, { asc }) {
           return asc(book.createdAt);
-        },
-        where(book, { eq, like }) {
-          if (options.query.authorId != null) {
-            return eq(book.authorId, options.query.authorId);
-          }
-          if (options.query.authorName != null) {
-            return like(author.name, `%${options.query.authorName}%`);
-          }
-          if (options.query.name != null) {
-            return like(book.name, `%${options.query.name}%`);
-          }
-          return;
         },
         with: {
           image: {
@@ -249,7 +268,14 @@ class BookRepository implements BookRepositoryInterface {
         },
       });
 
-      return ok(data);
+      const filteredData = data.filter((book) => {
+        return (
+          isContains({ query: options.query.keyword, target: book.name }) ||
+          isContains({ query: options.query.keyword, target: book.nameRuby })
+        );
+      });
+
+      return ok(filteredData);
     } catch (cause) {
       if (cause instanceof HTTPException) {
         return err(cause);

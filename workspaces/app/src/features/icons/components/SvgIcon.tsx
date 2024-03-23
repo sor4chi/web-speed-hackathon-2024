@@ -1,14 +1,21 @@
-import * as Icons from '@mui/icons-material';
+import { ArrowBack, Close, Favorite, FavoriteBorder, NavigateNext, Search } from '@mui/icons-material';
 
 type Props = {
   color: string;
   height: number;
-  type: keyof typeof Icons;
+  type: 'ArrowBack' | 'NavigateNext' | 'Close' | 'Favorite' | 'FavoriteBorder' | 'Search';
   width: number;
 };
 
 export const SvgIcon: React.FC<Props> = ({ color, height, type, width }) => {
   // eslint-disable-next-line
-  const Icon = Icons[type];
+  const Icon = {
+    ArrowBack: ArrowBack,
+    Close: Close,
+    Favorite: Favorite,
+    FavoriteBorder: FavoriteBorder,
+    NavigateNext: NavigateNext,
+    Search: Search,
+  }[type];
   return <Icon style={{ color, height, width }} />;
 };

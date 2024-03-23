@@ -1,6 +1,5 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { useMount } from 'react-use';
 import type { RouteParams } from 'regexparam';
 import invariant from 'tiny-invariant';
 
@@ -21,15 +20,15 @@ const EpisodeDetailPage: React.FC = () => {
 
   const [book, setBook] = useState<GetBookResponseWithEpisode>();
 
-  useMount(async () => {
-    if (book == null) {
-      setBook((window as any).__BLOG_INJECTED_DATA__);
+  useEffect(() => {
+    const injectedData = (window as any).__BLOG_INJECTED_DATA__;
+    if (book == null && injectedData != null && bookId === injectedData.id) {
+      setBook(injectedData);
     } else {
-      const res = await fetch(`/api/v1/books-with-episode/${bookId}`);
-      const json = await res.json();
-      setBook(json);
+      const res = fetch(`/api/v1/books-with-episode/${bookId}`);
+      res.then((res) => res.json()).then((json) => setBook(json));
     }
-  });
+  }, [bookId]);
 
   if (book == null) return null;
 

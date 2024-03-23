@@ -3,7 +3,6 @@ import styled from 'styled-components';
 
 import type { GetRankingListResponse } from '@wsh-2024/schema/src/api/rankings/GetRankingListResponse';
 
-import { SvgIcon } from '../../../features/icons/components/SvgIcon';
 import { Box } from '../../../foundation/components/Box';
 import { Flex } from '../../../foundation/components/Flex';
 import { Image } from '../../../foundation/components/Image';
@@ -13,6 +12,7 @@ import { Spacer } from '../../../foundation/components/Spacer';
 import { Text } from '../../../foundation/components/Text';
 import { useImage } from '../../../foundation/hooks/useImage';
 import { Color, Radius, Space, Typography } from '../../../foundation/styles/variables';
+import { NavigationNextIcon } from '../../icons/components/NavigationNextIcon';
 
 const _Wrapper = styled.li`
   width: 100%;
@@ -89,7 +89,8 @@ const RankingCard: React.FC<Props> = ({ item }) => {
               <Text color={Color.Secondary} typography={Typography.NORMAL14} weight="bold">
                 この漫画を読む
               </Text>
-              <SvgIcon color={Color.Secondary} height={32} type="NavigateNext" width={32} />
+
+              <NavigationNextIcon />
             </Flex>
           </Box>
         </Flex>

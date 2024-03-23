@@ -62,6 +62,14 @@ type BookModalAction = {
   openDetail: (bookId: string) => void;
 };
 
+let timer = 0;
+function debounce(callback: () => void, delay: number) {
+  clearTimeout(timer);
+  timer = window.setTimeout(() => {
+    callback();
+  }, delay);
+}
+
 export const BookListPage: React.FC = () => {
   const { data: bookList = [] } = useBookList();
   const bookListA11yId = useId();
@@ -179,7 +187,7 @@ export const BookListPage: React.FC = () => {
               borderColor="gray.400"
               name="query"
               onBlur={formik.handleBlur}
-              onChange={formik.handleChange}
+              onChange={(e) => debounce(() => formik.handleChange(e), 500)}
               placeholder="条件を入力"
             />
           </Flex>

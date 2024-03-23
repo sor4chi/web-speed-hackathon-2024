@@ -60,6 +60,14 @@ type AuthorModalAction = {
   openDetail: (authorId: string) => void;
 };
 
+let timer = 0;
+function debounce(fn: () => void, delay: number) {
+  clearTimeout(timer);
+  timer = window.setTimeout(() => {
+    fn();
+  }, delay);
+}
+
 export const AuthorListPage: React.FC = () => {
   const { data: authorList = [] } = useAuthorList();
   const authorListA11yId = useId();
@@ -148,7 +156,7 @@ export const AuthorListPage: React.FC = () => {
               borderColor="gray.400"
               name="query"
               onBlur={formik.handleBlur}
-              onChange={formik.handleChange}
+              onChange={(e) => debounce(() => formik.handleChange(e), 500)}
               placeholder="条件を入力"
             />
           </Flex>

@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import moment from 'moment-timezone';
-import { Suspense, useId } from 'react';
+import { useId } from 'react';
 
 import { BookCard } from '../../features/book/components/BookCard';
 import { FeatureCard } from '../../features/feature/components/FeatureCard';
@@ -38,7 +38,7 @@ const TopPage: React.FC = () => {
             ピックアップ
           </Text>
           <Spacer height={Space * 2} />
-          <Box maxWidth="100%" overflowX="scroll" overflowY="hidden">
+          <Box height={206} maxWidth="100%" overflowX="scroll" overflowY="hidden">
             <Flex align="stretch" direction="row" gap={Space * 2} justify="flex-start">
               {_.map(featureList, (feature) => (
                 <FeatureCard key={feature.id} bookId={feature.book.id} />
@@ -49,7 +49,7 @@ const TopPage: React.FC = () => {
 
         <Spacer height={Space * 2} />
 
-        <Box aria-labelledby={rankingA11yId} as="section" maxWidth="100%" width="100%">
+        <Box aria-labelledby={rankingA11yId} as="section" maxWidth="100%" minHeight="50vh" width="100%">
           <Text as="h2" color={Color.MONO_100} id={rankingA11yId} typography={Typography.NORMAL20} weight="bold">
             ランキング
           </Text>
@@ -72,7 +72,7 @@ const TopPage: React.FC = () => {
           <Spacer height={Space * 2} />
           <Box maxWidth="100%" overflowX="scroll" overflowY="hidden">
             <Flex align="stretch" gap={Space * 2} justify="flex-start">
-              {_.map(release.books, (book) => (
+              {_.map(release?.books || [], (book) => (
                 <BookCard key={book.id} bookId={book.id} />
               ))}
             </Flex>
@@ -84,11 +84,7 @@ const TopPage: React.FC = () => {
 };
 
 const TopPageWithSuspense: React.FC = () => {
-  return (
-    <Suspense fallback={null}>
-      <TopPage />
-    </Suspense>
-  );
+  return <TopPage />;
 };
 
 export { TopPageWithSuspense as TopPage };

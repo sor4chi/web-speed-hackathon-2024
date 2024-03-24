@@ -12,10 +12,10 @@ const _Image = styled.img`
 `;
 
 const SRCSETS = [
-  { mw: 1024, path: '/images/hero-1024.webp' },
-  { mw: 768, path: '/images/hero-768.webp' },
-  { mw: 640, path: '/images/hero-640.webp' },
   { mw: 320, path: '/images/hero-320.webp' },
+  { mw: 640, path: '/images/hero-640.webp' },
+  { mw: 768, path: '/images/hero-768.webp' },
+  { mw: 1024, path: '/images/hero-1024.webp' },
 ];
 
 const buildSrcset = () => {
@@ -30,7 +30,7 @@ export const HeroImage: React.FC = () => {
         height="576"
         loading="eager"
         sizes="(max-width:1024px) 100vw, 1024px"
-        src={SRCSETS[0]?.path}
+        src={SRCSETS[SRCSETS.length - 1]?.path}
         srcSet={buildSrcset()}
         width="1024"
       />

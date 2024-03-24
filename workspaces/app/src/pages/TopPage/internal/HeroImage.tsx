@@ -12,10 +12,10 @@ const _Image = styled.img`
 `;
 
 const SRCSETS = [
-  { mw: 1024, path: '/assets/images/hero-1024.webp' },
-  { mw: 768, path: '/assets/images/hero-768.webp' },
-  { mw: 640, path: '/assets/images/hero-640.webp' },
-  { mw: 320, path: '/assets/images/hero-320.webp' },
+  { mw: 1024, path: '/images/hero-1024.webp' },
+  { mw: 768, path: '/images/hero-768.webp' },
+  { mw: 640, path: '/images/hero-640.webp' },
+  { mw: 320, path: '/images/hero-320.webp' },
 ];
 
 const buildSrcset = () => {

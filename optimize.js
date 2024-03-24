@@ -2,7 +2,7 @@ import { glob } from 'fast-glob';
 import sharp from 'sharp';
 
 await Promise.all(
-  (await glob('./workspaces/client/assets/images/hero.png')).map(async (path) => {
+  (await glob('./workspaces/client/public/images/hero.png')).map(async (path) => {
     const ratio = 16 / 9;
     [1024, 768, 640, 320].forEach(async (width) => {
       await sharp(path)

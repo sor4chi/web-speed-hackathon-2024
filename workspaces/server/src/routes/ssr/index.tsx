@@ -13,13 +13,6 @@ import { bookRepository } from '../../repositories';
 
 const app = new Hono();
 
-const SRCSETS = [
-  { maxw: 9999, minw: 768, path: '/assets/images/hero-1024.webp' },
-  { maxw: 768, minw: 640, path: '/assets/images/hero-768.webp' },
-  { maxw: 640, minw: 320, path: '/assets/images/hero-640.webp' },
-  { maxw: 320, minw: 0, path: '/assets/images/hero-320.webp' },
-];
-
 const getImageUrl = (id: string) => `/images/${id}?format=webp&width=192&height=256`;
 
 const ssrInjecter = '<script id="inject-data" type="application/json"></script>';
@@ -30,16 +23,7 @@ async function createHTML({ body, path, styleTags }: { body: string; path: strin
   let content = htmlContent
     .replaceAll('<div id="root"></div>', `<div id="root">${body}</div>`)
     .replaceAll('<style id="tag"></style>', styleTags);
-  // preload hero image
-  if (path === '/') {
-    content = content.replaceAll(
-      '<head>',
-      `<head>\n${SRCSETS.map(
-        ({ maxw, minw, path }) =>
-          `<link rel="preload" href="${path}" as="image" media="(min-width: ${minw}px) and (max-width: ${maxw}px)" />`,
-      ).join('\n')}`,
-    );
-  }
+
   if (path.startsWith('/books/')) {
     const splitted = path.split('/');
     const bookId = splitted[2];

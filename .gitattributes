@@ -1,0 +1,1 @@
+workspaces/server/seeds/database.sqlite filter=lfs diff=lfs merge=lfs -text

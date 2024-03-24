@@ -5,6 +5,8 @@ import * as yup from 'yup';
 
 import { useLogin } from '../../../features/auth/hooks/useLogin';
 
+const reg = new RegExp(/[!"#$%&'()\*\+\-\.,\/:;<=>?@\[\\\]^_`{|}~]/g);
+
 export const LoginContent: React.FC = () => {
   const login = useLogin();
   const loginContentA11yId = useId();
@@ -30,7 +32,7 @@ export const LoginContent: React.FC = () => {
         .required('パスワードを入力してください')
         .test({
           message: 'パスワードには記号を含めてください',
-          test: (v) => /[^\P{Letter}&&\P{Number}]/.test(v),
+          test: (v) => reg.test(v),
         }),
     }),
   });

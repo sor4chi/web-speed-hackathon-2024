@@ -1,7 +1,7 @@
 import { MAPPING } from './mapping';
 
-const COLUMN_SIZE = 8;
-const ROW_SIZE = 16;
+const COLUMN_SIZE = 5;
+const ROW_SIZE = 13;
 
 export async function decrypt({
   exportCanvasContext,

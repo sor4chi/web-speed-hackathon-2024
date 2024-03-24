@@ -35,7 +35,6 @@ class FeatureRepository implements FeatureRepositoryInterface {
             with: {
               author: {
                 columns: {
-                  description: true,
                   id: true,
                   name: true,
                 },
@@ -46,14 +45,6 @@ class FeatureRepository implements FeatureRepositoryInterface {
                       id: true,
                     },
                   },
-                },
-              },
-              episodes: {
-                columns: {
-                  chapter: true,
-                  description: true,
-                  id: true,
-                  name: true,
                 },
               },
               image: {

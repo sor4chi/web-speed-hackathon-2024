@@ -36,7 +36,6 @@ class RankingRepository implements RankingRepositoryInterface {
             with: {
               author: {
                 columns: {
-                  description: true,
                   id: true,
                   name: true,
                 },
@@ -47,14 +46,6 @@ class RankingRepository implements RankingRepositoryInterface {
                       id: true,
                     },
                   },
-                },
-              },
-              episodes: {
-                columns: {
-                  chapter: true,
-                  description: true,
-                  id: true,
-                  name: true,
                 },
               },
               image: {

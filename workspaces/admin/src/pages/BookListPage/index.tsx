@@ -71,44 +71,7 @@ const isQueryEmpty = (query: AdvancedSearchBookRequestQuery) => {
 export const BookListPage: React.FC = () => {
   const bookListA11yId = useId();
 
-  const formik = useFormik({
-    initialValues: {
-      kind: BookSearchKind.BookId as BookSearchKind,
-      query: '',
-    },
-    onSubmit() {},
-  });
-
   const [query, setQuery] = useState<AdvancedSearchBookRequestQuery>({});
-
-  useMemo(() => {
-    if (formik.values.query === '') {
-      setQuery({});
-      return;
-    }
-
-    switch (formik.values.kind) {
-      case BookSearchKind.BookId: {
-        setQuery({ bookId: formik.values.query });
-        break;
-      }
-      case BookSearchKind.BookName: {
-        setQuery({ bookName: formik.values.query });
-        break;
-      }
-      case BookSearchKind.AuthorId: {
-        setQuery({ authorId: formik.values.query });
-        break;
-      }
-      case BookSearchKind.AuthorName: {
-        setQuery({ authorName: formik.values.query });
-        break;
-      }
-      default: {
-        formik.values.kind satisfies never;
-      }
-    }
-  }, [formik.values.kind, formik.values.query]);
 
   const [useModalStore] = useState(() => {
     return create<BookModalState & BookModalAction>()((set) => ({
@@ -134,60 +97,7 @@ export const BookListPage: React.FC = () => {
   return (
     <>
       <Stack height="100%" p={4} spacing={6}>
-        <StackItem aria-label="検索セクション" as="section">
-          <RadioGroup name="kind" value={formik.values.kind}>
-            <Stack direction="row" spacing={4}>
-              <Radio
-                color="gray.400"
-                colorScheme="teal"
-                onBlur={formik.handleBlur}
-                onChange={formik.handleChange}
-                value={BookSearchKind.BookId}
-              >
-                作品 ID
-              </Radio>
-              <Radio
-                color="gray.400"
-                colorScheme="teal"
-                onBlur={formik.handleBlur}
-                onChange={formik.handleChange}
-                value={BookSearchKind.BookName}
-              >
-                作品名
-              </Radio>
-              <Radio
-                color="gray.400"
-                colorScheme="teal"
-                onBlur={formik.handleBlur}
-                onChange={formik.handleChange}
-                value={BookSearchKind.AuthorId}
-              >
-                作者 ID
-              </Radio>
-              <Radio
-                color="gray.400"
-                colorScheme="teal"
-                onBlur={formik.handleBlur}
-                onChange={formik.handleChange}
-                value={BookSearchKind.AuthorName}
-              >
-                作者名
-              </Radio>
-            </Stack>
-          </RadioGroup>
-
-          <Spacer height={2} />
-
-          <Flex gap={2}>
-            <Input
-              borderColor="gray.400"
-              name="query"
-              onBlur={formik.handleBlur}
-              onChange={formik.handleChange}
-              placeholder="条件を入力"
-            />
-          </Flex>
-        </StackItem>
+        <SearchForm onQueryChange={(query) => setQuery(query)} />
 
         <Divider />
 
@@ -242,17 +152,7 @@ interface BookListProps {
 }
 
 const BookList = memo(({ onDetailClick, query }: BookListProps) => {
-  const [delayedQuery, setDelayedQuery] = useState(query);
-
-  useDebounce(
-    () => {
-      setDelayedQuery(query);
-    },
-    500,
-    [query],
-  );
-
-  const { data: books } = useBookAdvancedSearch(delayedQuery);
+  const { data: books } = useBookAdvancedSearch(query);
 
   if (!books) return null;
 
@@ -284,3 +184,115 @@ const BookList = memo(({ onDetailClick, query }: BookListProps) => {
 });
 
 BookList.displayName = 'BookList';
+
+interface SearchFormProps {
+  onQueryChange: (query: AdvancedSearchBookRequestQuery) => void;
+}
+
+const SearchForm = memo(({ onQueryChange }: SearchFormProps) => {
+  const [query, setQuery] = useState<AdvancedSearchBookRequestQuery>({});
+
+  const formik = useFormik({
+    initialValues: {
+      kind: BookSearchKind.BookId as BookSearchKind,
+      query: '',
+    },
+    onSubmit() {},
+  });
+
+  useMemo(() => {
+    if (formik.values.query === '') {
+      setQuery({});
+      return;
+    }
+
+    switch (formik.values.kind) {
+      case BookSearchKind.BookId: {
+        setQuery({ bookId: formik.values.query });
+        break;
+      }
+      case BookSearchKind.BookName: {
+        setQuery({ bookName: formik.values.query });
+        break;
+      }
+      case BookSearchKind.AuthorId: {
+        setQuery({ authorId: formik.values.query });
+        break;
+      }
+      case BookSearchKind.AuthorName: {
+        setQuery({ authorName: formik.values.query });
+        break;
+      }
+      default: {
+        formik.values.kind satisfies never;
+      }
+    }
+  }, [formik.values.kind, formik.values.query]);
+
+  useDebounce(
+    () => {
+      onQueryChange(query);
+    },
+    500,
+    [query],
+  );
+
+  return (
+    <StackItem aria-label="検索セクション" as="section">
+      <RadioGroup name="kind" value={formik.values.kind}>
+        <Stack direction="row" spacing={4}>
+          <Radio
+            color="gray.400"
+            colorScheme="teal"
+            onBlur={formik.handleBlur}
+            onChange={formik.handleChange}
+            value={BookSearchKind.BookId}
+          >
+            作品 ID
+          </Radio>
+          <Radio
+            color="gray.400"
+            colorScheme="teal"
+            onBlur={formik.handleBlur}
+            onChange={formik.handleChange}
+            value={BookSearchKind.BookName}
+          >
+            作品名
+          </Radio>
+          <Radio
+            color="gray.400"
+            colorScheme="teal"
+            onBlur={formik.handleBlur}
+            onChange={formik.handleChange}
+            value={BookSearchKind.AuthorId}
+          >
+            作者 ID
+          </Radio>
+          <Radio
+            color="gray.400"
+            colorScheme="teal"
+            onBlur={formik.handleBlur}
+            onChange={formik.handleChange}
+            value={BookSearchKind.AuthorName}
+          >
+            作者名
+          </Radio>
+        </Stack>
+      </RadioGroup>
+
+      <Spacer height={2} />
+
+      <Flex gap={2}>
+        <Input
+          borderColor="gray.400"
+          name="query"
+          onBlur={formik.handleBlur}
+          onChange={formik.handleChange}
+          placeholder="条件を入力"
+        />
+      </Flex>
+    </StackItem>
+  );
+});
+
+SearchForm.displayName = 'SearchForm';

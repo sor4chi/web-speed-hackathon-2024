@@ -18,7 +18,8 @@ import {
   Tr,
 } from '@chakra-ui/react';
 import { useFormik } from 'formik';
-import { useId, useMemo, useState } from 'react';
+import { memo, useId, useMemo, useState } from 'react';
+import { useDebounce } from 'react-use';
 import { create } from 'zustand';
 
 import type { AdvancedSearchBookRequestQuery } from '@wsh-2024/schema/src/api/books/AdvancedSearchBookRequestQuery';
@@ -62,14 +63,6 @@ type BookModalAction = {
   openCreate: () => void;
   openDetail: (bookId: string) => void;
 };
-
-let timer = 0;
-function debounce(callback: () => void, delay: number) {
-  clearTimeout(timer);
-  timer = window.setTimeout(() => {
-    callback();
-  }, delay);
-}
 
 export const BookListPage: React.FC = () => {
   const bookListA11yId = useId();
@@ -186,7 +179,7 @@ export const BookListPage: React.FC = () => {
               borderColor="gray.400"
               name="query"
               onBlur={formik.handleBlur}
-              onChange={(e) => debounce(() => formik.handleChange(e), 500)}
+              onChange={formik.handleChange}
               placeholder="条件を入力"
             />
           </Flex>
@@ -242,8 +235,18 @@ interface BookListProps {
   query: AdvancedSearchBookRequestQuery;
 }
 
-const BookList = ({ onDetailClick, query }: BookListProps) => {
-  const { data: books } = useBookAdvancedSearch(query);
+const BookList = memo(({ onDetailClick, query }: BookListProps) => {
+  const [delayedQuery, setDelayedQuery] = useState(query);
+
+  useDebounce(
+    () => {
+      setDelayedQuery(query);
+    },
+    500,
+    [query],
+  );
+
+  const { data: books } = useBookAdvancedSearch(delayedQuery);
 
   if (!books) return null;
 
@@ -272,4 +275,6 @@ const BookList = ({ onDetailClick, query }: BookListProps) => {
       ))}
     </>
   );
-};
+});
+
+BookList.displayName = 'BookList';

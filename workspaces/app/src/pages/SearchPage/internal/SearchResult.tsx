@@ -1,4 +1,4 @@
-import { Suspense } from 'react';
+import { memo, Suspense } from 'react';
 
 import { BookListItem } from '../../../features/book/components/BookListItem';
 import { useBookSearch } from '../../../features/book/hooks/useBookSearch';
@@ -34,7 +34,7 @@ const SerachResultList: React.FC<Props> = ({ keyword }) => {
   );
 };
 
-export const SearchResult: React.FC<Props> = ({ keyword }) => {
+export const SearchResult = memo(({ keyword }: Props) => {
   if (keyword === '') return null;
   return (
     <Flex align="center" as="ul" direction="column" justify="center">
@@ -49,4 +49,6 @@ export const SearchResult: React.FC<Props> = ({ keyword }) => {
       </Suspense>
     </Flex>
   );
-};
+});
+
+SearchResult.displayName = 'SearchResult';

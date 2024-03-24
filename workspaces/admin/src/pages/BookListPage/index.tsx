@@ -64,6 +64,10 @@ type BookModalAction = {
   openDetail: (bookId: string) => void;
 };
 
+const isQueryEmpty = (query: AdvancedSearchBookRequestQuery) => {
+  return Object.values(query).every((value) => !value);
+};
+
 export const BookListPage: React.FC = () => {
   const bookListA11yId = useId();
 
@@ -215,7 +219,9 @@ export const BookListPage: React.FC = () => {
                 </Tr>
               </Thead>
               <Tbody>
-                <BookList onDetailClick={(bookId) => modalState.openDetail(bookId)} query={query} />
+                {!isQueryEmpty(query) && (
+                  <BookList onDetailClick={(bookId) => modalState.openDetail(bookId)} query={query} />
+                )}
               </Tbody>
             </Table>
           </TableContainer>

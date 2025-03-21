@@ -1,4 +1,6 @@
-# Web Speed Hackathon 2024 Cyber TOON
+# Web Speed Hackathon 2024 By Sor4chi
+
+開催時625点でスコア1位（レギュレーション落ち）のコードです
 
 ## 概要
 
